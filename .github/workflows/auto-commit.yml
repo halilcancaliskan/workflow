@@ -1,0 +1,32 @@
+name: Auto Commit
+
+on:
+  schedule:
+    - cron: "0 0 * * 1-6"   # Runs at midnight UTC every day except Sunday
+    - cron: "0 8 * * 1-6"   # Runs at 8 AM UTC every day except Sunday
+    - cron: "0 16 * * 1-6"  # Runs at 4 PM UTC every day except Sunday
+
+jobs:
+  commit:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Git
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+    - name: Update timestamp
+      run: |
+        date -u +"Updated on %Y-%m-%d %H:%M:%S" > TIMESTAMP.txt
+
+    - name: Commit changes
+      run: |
+        git add TIMESTAMP.txt
+        git commit -m "Automated update of timestamp"
+
+    - name: Push changes
+      run: git push
