@@ -1,0 +1,38 @@
+name: 🚀 Build and Deploy
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+
+jobs:
+  build-scripts:
+    runs-on: [ self-hosted, Linux, standard ]
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: 🔐 Import secrets from Vault
+        uses: adeo/vault-action@v1
+        with:
+          vault-namespace: frlm/prm
+          vault-jwt-role-name: ${{ github.event.repository.name }}
+          vault-secrets: |
+            secret/data/ci WRITER_USER_NAME | USER_NAME ;
+            secret/data/ci WRITER_USER_TOKEN | USER_TOKEN ;
+
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Set up JDK 8
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 8
+
+      - name: 🏗️ Build Java Project
+        run: |
+          mvn deploy -f crm/pom.xml -s settings.xml -pl crm-interfaces,crm-rest,crm-services,crm-webapp,crm-webapp-accessibility,crm-webservices -B -DskipTests
