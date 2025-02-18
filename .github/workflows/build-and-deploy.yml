@@ -15,15 +15,6 @@ jobs:
       id-token: write
 
     steps:
-      - name: 🔐 Import secrets from Vault
-        uses: adeo/vault-action@v1
-        with:
-          vault-namespace: frlm/prm
-          vault-jwt-role-name: ${{ github.event.repository.name }}
-          vault-secrets: |
-            secret/data/ci WRITER_USER_NAME | USER_NAME ;
-            secret/data/ci WRITER_USER_TOKEN | USER_TOKEN ;
-
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
 
